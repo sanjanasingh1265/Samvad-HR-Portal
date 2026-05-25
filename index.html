@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>SAMVAD — Grievance Portal | Tata Steel Meramandali</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ── ROOT TOKENS ─────────────────────────────────────────── */
+:root {
+  --ink:      #0A0F1E;
+  --ink2:     #131929;
+  --ink3:     #1C2440;
+  --panel:    #1A2035;
+  --gold:     #C8922A;
+  --gold2:    #E8B84B;
+  --goldDim:  rgba(200,146,42,0.15);
+  --white:    #FFFFFF;
+  --muted:    rgba(255,255,255,0.55);
+  --faint:    rgba(255,255,255,0.08);
+  --border:   rgba(255,255,255,0.1);
+
+  /* category colours */
+  --amenity:  #00BFA5;
+  --amenityD: #004D40;
+  --employ:   #448AFF;
+  --employD:  #0D2B6E;
+  --safety:   #FF5252;
+  --safetyD:  #5C0A0A;
+
+  --r: 14px;
+  --rSm: 8px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.45);
+}
+
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+
+html { scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+
+body {
+  font-family:'Sora', sans-serif;
+  background: var(--ink);
+  color: var(--white);
+  min-height:100dvh;
+  overflow-x:hidden;
+}
+
+/* ── TRICOLOR ── */
+.tricolor {
+  height:5px;
+  background:linear-gradient(to right,#FF671F 33.33%,#fff 33.33% 66.66%,#046A38 66.66%);
+  position:sticky; top:0; z-index:100;
+}
+
+/* ── SCREENS ── */
+.screen { display:none; min-height:100dvh; flex-direction:column; }
+.screen.active { display:flex; animation:fadeUp .35s ease; }
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(12px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── HERO ── */
+.hero {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(200,146,42,.18) 0%, transparent 70%),
+    linear-gradient(180deg, var(--ink2) 0%, var(--ink) 100%);
+  padding:36px 20px 28px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.hero::before {
+  content:'';
+  position:absolute; inset:0;
+  background:radial-gradient(circle 400px at 50% 50%, rgba(200,146,42,.04), transparent);
+  pointer-events:none;
+}
+
+.logo-ring {
+  width:72px; height:72px;
+  border-radius:50%;
+  background:var(--goldDim);
+  border:2px solid var(--gold);
+  display:flex; align-items:center; justify-content:center;
+  margin:0 auto 18px;
+  font-size:30px;
+  box-shadow:0 0 32px rgba(200,146,42,.3);
+}
+
+.hero-title {
+  font-size:clamp(32px,8vw,48px);
+  font-weight:800;
+  letter-spacing:6px;
+  color:var(--gold);
+  line-height:1;
+  margin-bottom:4px;
+}
+.hero-devanagari {
+  font-family:'Noto Sans Devanagari', sans-serif;
+  font-size:16px; color:rgba(200,146,42,.6);
+  margin-bottom:12px;
+}
+.hero-sub {
+  font-size:15px; font-weight:600; color:var(--white); margin-bottom:4px;
+}
+.hero-org {
+  font-size:12px; color:var(--muted);
+}
+
+/* ── LANG BADGE ── */
+.lang-row {
+  display:flex; justify-content:center; gap:8px;
+  margin-top:16px;
+}
+.lang-badge {
+  background:var(--faint); border:1px solid var(--border);
+  border-radius:20px; padding:4px 12px;
+  font-size:11px; font-weight:500; color:var(--muted);
+}
+.lang-badge.active { background:var(--goldDim); border-color:rgba(200,146,42,.4); color:var(--gold); }
+
+/* ── NOTICE STRIP ── */
+.notice {
+  background:var(--goldDim);
+  border:1px solid rgba(200,146,42,.25);
+  border-radius:var(--rSm);
+  margin:16px 16px 0;
+  padding:10px 14px;
+  display:flex; align-items:center; gap:10px;
+  font-size:12px; color:var(--gold);
+  font-weight:500; line-height:1.5;
+}
+.notice-icon { font-size:18px; flex-shrink:0; }
+
+/* ── CONTENT WRAPPER ── */
+.content { padding:16px; flex:1; max-width:520px; margin:0 auto; width:100%; }
+
+/* ── SECTION LABEL ── */
+.section-label {
+  font-size:10px; font-weight:700; letter-spacing:2.5px;
+  color:rgba(255,255,255,.35); text-transform:uppercase;
+  text-align:center; margin:20px 0 12px;
+}
+
+/* ── CATEGORY CARDS ── */
+.cat-card {
+  border-radius:var(--r);
+  margin-bottom:14px;
+  cursor:pointer;
+  text-decoration:none;
+  display:block;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  transition:transform .18s cubic-bezier(.2,.8,.3,1), box-shadow .18s;
+  border:1px solid var(--faint);
+  position:relative;
+}
+.cat-card:active { transform:scale(.97); box-shadow:0 4px 16px rgba(0,0,0,.4); }
+.cat-card::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg, rgba(255,255,255,.06) 0%, transparent 60%);
+  pointer-events:none;
+}
+
+.cat-card-inner { padding:20px 18px 16px; }
+.cat-card-head { display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+.cat-icon {
+  width:52px; height:52px; border-radius:13px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:26px; flex-shrink:0;
+}
+.cat-info { flex:1; }
+.cat-name { font-size:18px; font-weight:700; line-height:1.1; }
+.cat-name-hi { font-family:'Noto Sans Devanagari',sans-serif; font-size:13px; opacity:.7; margin-top:2px; }
+.cat-desc { font-size:12px; color:var(--muted); margin-top:1px; }
+
+.cat-tags { display:flex; flex-wrap:wrap; gap:6px; }
+.cat-tag {
+  background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.12);
+  border-radius:20px; padding:3px 10px;
+  font-size:10.5px; color:rgba(255,255,255,.8);
+}
+
+.cat-footer {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 18px;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.cat-count { font-size:11px; color:var(--muted); }
+.cat-btn {
+  padding:5px 16px; border-radius:20px;
+  font-size:11px; font-weight:700; letter-spacing:.5px;
+  background:rgba(255,255,255,.15); color:var(--white);
+  border:none; cursor:pointer;
+}
+
+/* ── AMENITIES CARD ── */
+.card-amenity { background:linear-gradient(145deg, #003D35 0%, #006657 40%, #00BFA5 100%); }
+.card-amenity .cat-icon { background:rgba(0,191,165,.2); color:var(--amenity); }
+
+/* ── EMPLOYMENT CARD ── */
+.card-employ { background:linear-gradient(145deg, #071C4A 0%, #1A3E8F 40%, #448AFF 100%); }
+.card-employ .cat-icon { background:rgba(68,138,255,.2); color:var(--employ); }
+
+/* ── SAFETY CARD ── */
+.card-safety { background:linear-gradient(145deg, #3D0000 0%, #8C1A1A 40%, #FF5252 100%); }
+.card-safety .cat-icon { background:rgba(255,82,82,.2); color:var(--safety); }
+
+/* ── PRIVACY BOX ── */
+.privacy-box {
+  background:var(--faint); border:1px solid var(--border);
+  border-radius:var(--r); padding:14px 16px;
+  display:flex; align-items:flex-start; gap:12px;
+  margin-bottom:20px;
+}
+.privacy-icon { font-size:20px; flex-shrink:0; margin-top:1px; }
+.privacy-text { font-size:11px; color:var(--muted); line-height:1.7; }
+.privacy-text strong { color:rgba(255,255,255,.8); }
+
+/* ── PAGE HEADER ── */
+.page-header {
+  padding:24px 20px 16px;
+  background:
+    linear-gradient(180deg, var(--ink2) 0%, transparent 100%),
+    var(--ink);
+  position:sticky; top:5px; z-index:50;
+}
+.back-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  font-size:13px; font-weight:600; color:var(--muted);
+  background:var(--faint); border:1px solid var(--border);
+  border-radius:20px; padding:7px 14px;
+  cursor:pointer; border-radius:20px;
+  transition:all .18s;
+  margin-bottom:14px;
+}
+.back-btn:hover { color:var(--white); background:var(--panel); }
+
+.cat-header {
+  display:flex; align-items:center; gap:14px;
+}
+.cat-header-icon {
+  width:48px; height:48px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:24px; flex-shrink:0;
+}
+.cat-header-title { font-size:22px; font-weight:800; }
+.cat-header-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+.cat-header-divider {
+  height:2px; border-radius:1px; margin-top:14px;
+  background:linear-gradient(to right, currentColor 0%, transparent 70%);
+}
+
+/* ── FORM CONTENT ── */
+.form-content { padding:16px; max-width:520px; margin:0 auto; width:100%; flex:1; }
+
+/* ── GRIEVANCE ITEM ── */
+.grievance-item {
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--r); margin-bottom:12px;
+  overflow:hidden;
+  box-shadow:0 4px 20px rgba(0,0,0,.3);
+  cursor:pointer;
+  transition:border-color .2s, box-shadow .2s;
+}
+.grievance-item.selected {
+  border-color:var(--accent-color);
+  box-shadow:0 0 0 2px var(--accent-color), 0 4px 20px rgba(0,0,0,.3);
+}
+
+.grievance-head {
+  display:flex; align-items:center; gap:12px;
+  padding:16px;
+}
+.grievance-emoji { font-size:22px; flex-shrink:0; width:36px; text-align:center; }
+.grievance-info { flex:1; }
+.grievance-title { font-size:14px; font-weight:600; line-height:1.3; }
+.grievance-sub { font-size:11px; color:var(--muted); margin-top:2px; }
+.select-circle {
+  width:22px; height:22px; border-radius:50%;
+  border:2px solid rgba(255,255,255,.25);
+  flex-shrink:0; display:flex; align-items:center; justify-content:center;
+  transition:all .15s;
+}
+.grievance-item.selected .select-circle {
+  background:var(--accent-color); border-color:var(--accent-color);
+}
+.select-circle::after {
+  content:'✓'; font-size:11px; font-weight:700; color:var(--white);
+  opacity:0; transition:opacity .15s;
+}
+.grievance-item.selected .select-circle::after { opacity:1; }
+
+/* ── EXPAND SECTION ── */
+.grievance-detail {
+  display:none; padding:0 16px 16px;
+  border-top:1px solid var(--border);
+}
+.grievance-item.selected .grievance-detail { display:block; }
+
+.detail-question { font-size:12px; font-weight:600; color:var(--muted); margin-bottom:8px; margin-top:12px; }
+
+.radio-group { display:flex; flex-direction:column; gap:6px; }
+.radio-opt {
+  display:flex; align-items:center; gap:10px;
+  background:rgba(255,255,255,.04); border:1px solid var(--border);
+  border-radius:var(--rSm); padding:10px 12px;
+  cursor:pointer; transition:all .15s;
+}
+.radio-opt:hover { background:rgba(255,255,255,.08); }
+.radio-opt input[type=radio] { display:none; }
+.radio-circle {
+  width:16px; height:16px; border-radius:50%;
+  border:2px solid rgba(255,255,255,.3); flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .15s;
+}
+.radio-opt input[type=radio]:checked ~ .radio-circle {
+  background:var(--accent-color); border-color:var(--accent-color);
+}
+.radio-opt input[type=radio]:checked ~ .radio-circle::after { content:''; }
+.radio-circle::after {
+  width:6px; height:6px; border-radius:50%; background:var(--white);
+}
+.radio-label { font-size:13px; color:rgba(255,255,255,.85); line-height:1.3; }
+
+.detail-textarea {
+  width:100%; background:rgba(255,255,255,.05);
+  border:1px solid var(--border); border-radius:var(--rSm);
+  color:var(--white); font-family:'Sora',sans-serif; font-size:13px;
+  padding:12px; resize:none; outline:none;
+  transition:border-color .18s;
+  min-height:80px;
+}
+.detail-textarea:focus { border-color:var(--accent-color); }
+.detail-textarea::placeholder { color:rgba(255,255,255,.3); }
+
+.scale-row { display:flex; gap:6px; }
+.scale-btn {
+  flex:1; padding:10px 6px; border-radius:var(--rSm);
+  background:rgba(255,255,255,.05); border:1px solid var(--border);
+  color:var(--muted); font-size:12px; font-weight:600; text-align:center;
+  cursor:pointer; transition:all .15s;
+}
+.scale-btn.active {
+  background:var(--accent-color); border-color:var(--accent-color);
+  color:var(--white);
+}
+
+/* ── ANONYMOUS TOGGLE ── */
+.anon-row {
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--r); padding:14px 16px;
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:16px;
+}
+.anon-text { font-size:13px; font-weight:500; color:rgba(255,255,255,.8); }
+.anon-sub { font-size:11px; color:var(--muted); margin-top:2px; }
+.toggle {
+  width:44px; height:24px; border-radius:12px;
+  background:rgba(255,255,255,.1); border:1px solid var(--border);
+  cursor:pointer; position:relative; transition:background .2s;
+  flex-shrink:0;
+}
+.toggle.on { background:var(--amenity); border-color:var(--amenity); }
+.toggle::after {
+  content:''; position:absolute; top:3px; left:3px;
+  width:16px; height:16px; border-radius:50%;
+  background:var(--white); transition:transform .2s;
+}
+.toggle.on::after { transform:translateX(20px); }
+
+/* ── REPORTER TYPE ── */
+.reporter-row {
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--r); padding:14px 16px; margin-bottom:12px;
+}
+.reporter-label { font-size:12px; font-weight:600; color:var(--muted); margin-bottom:10px; }
+.reporter-opts { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+.reporter-opt {
+  background:rgba(255,255,255,.05); border:1px solid var(--border);
+  border-radius:var(--rSm); padding:10px 8px; text-align:center;
+  cursor:pointer; transition:all .15s;
+  font-size:12px; font-weight:500; color:var(--muted);
+}
+.reporter-opt.active {
+  background:var(--goldDim); border-color:rgba(200,146,42,.4); color:var(--gold);
+}
+.reporter-opt .ro-emoji { font-size:18px; display:block; margin-bottom:4px; }
+
+/* ── DIVISION SELECT ── */
+.select-field {
+  width:100%; background:rgba(255,255,255,.05);
+  border:1px solid var(--border); border-radius:var(--rSm);
+  color:var(--white); font-family:'Sora',sans-serif; font-size:13px;
+  padding:12px 14px; outline:none; cursor:pointer;
+  transition:border-color .18s; appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M6 8L0 0h12z' fill='%23ffffff44'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 14px center;
+}
+.select-field:focus { border-color:var(--gold); }
+.select-field option { background:var(--ink2); color:var(--white); }
+
+/* ── FIELD LABEL ── */
+.field-label { font-size:12px; font-weight:600; color:var(--muted); margin-bottom:8px; }
+
+/* ── SUBMIT BTN ── */
+.submit-btn {
+  width:100%; padding:16px;
+  border-radius:var(--r); border:none;
+  font-family:'Sora',sans-serif; font-size:15px; font-weight:700;
+  cursor:pointer; letter-spacing:.5px;
+  transition:all .2s; margin-bottom:12px;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+}
+.submit-btn:active { transform:scale(.98); }
+
+/* ── SUCCESS SCREEN ── */
+.success-card {
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--r); padding:32px 24px;
+  text-align:center; box-shadow:var(--shadow);
+}
+.success-ring {
+  width:80px; height:80px; border-radius:50%;
+  background:rgba(0,191,165,.15); border:2px solid var(--amenity);
+  display:flex; align-items:center; justify-content:center;
+  font-size:36px; margin:0 auto 20px;
+}
+.success-title { font-size:22px; font-weight:800; margin-bottom:8px; }
+.success-sub { font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:24px; }
+.case-id {
+  font-family:'JetBrains Mono',monospace;
+  font-size:14px; color:var(--gold);
+  background:var(--goldDim); border:1px solid rgba(200,146,42,.25);
+  border-radius:var(--rSm); padding:8px 16px;
+  display:inline-block; margin-bottom:24px;
+  letter-spacing:1px;
+}
+.what-next { text-align:left; margin-bottom:20px; }
+.what-next-title { font-size:11px; font-weight:700; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:10px; }
+.next-item { display:flex; gap:10px; align-items:flex-start; margin-bottom:8px; }
+.next-dot { width:6px; height:6px; border-radius:50%; background:var(--gold); margin-top:6px; flex-shrink:0; }
+.next-text { font-size:13px; color:rgba(255,255,255,.75); line-height:1.5; }
+
+.home-btn {
+  width:100%; padding:14px;
+  border-radius:var(--r); border:1px solid var(--border);
+  background:var(--faint); color:var(--white);
+  font-family:'Sora',sans-serif; font-size:14px; font-weight:600;
+  cursor:pointer; transition:all .2s;
+}
+.home-btn:hover { background:var(--panel); }
+
+/* ── FOOTER ── */
+.portal-footer {
+  padding:20px;
+  text-align:center;
+  border-top:1px solid var(--border);
+  margin-top:auto;
+}
+.footer-text { font-size:10px; color:rgba(255,255,255,.25); line-height:2; }
+.footer-badge {
+  display:inline-block; background:var(--goldDim);
+  border:1px solid rgba(200,146,42,.2); border-radius:20px;
+  padding:3px 12px; font-size:9px; color:rgba(200,146,42,.7);
+  letter-spacing:1px; margin-top:6px;
+}
+
+/* ── PROGRESS BAR ── */
+.progress-bar-wrap {
+  background:rgba(255,255,255,.08); border-radius:4px;
+  height:4px; margin:0 20px 0;
+}
+.progress-bar-fill {
+  height:100%; border-radius:4px;
+  background:var(--gold); transition:width .4s;
+}
+
+/* ── URGENCY BADGE ── */
+.urgency-badge {
+  display:inline-flex; align-items:center; gap:4px;
+  font-size:10px; font-weight:700; letter-spacing:.5px;
+  padding:3px 10px; border-radius:20px;
+  margin-left:auto; flex-shrink:0;
+}
+.urgency-high { background:rgba(255,82,82,.2); color:#FF8A80; border:1px solid rgba(255,82,82,.3); }
+.urgency-med  { background:rgba(255,171,0,.2); color:#FFD54F; border:1px solid rgba(255,171,0,.3); }
+.urgency-low  { background:rgba(0,191,165,.2); color:#80CBC4; border:1px solid rgba(0,191,165,.3); }
+
+/* ── STEP INDICATOR ── */
+.step-indicator {
+  display:flex; gap:6px; justify-content:center; padding:12px 0;
+}
+.step-dot {
+  width:6px; height:6px; border-radius:50%;
+  background:rgba(255,255,255,.2); transition:all .2s;
+}
+.step-dot.active { background:var(--gold); width:20px; border-radius:3px; }
+
+/* Accent utilities */
+.amenity { --accent-color: var(--amenity); }
+.employ  { --accent-color: var(--employ); }
+.safety  { --accent-color: var(--safety); }
+
+.text-amenity { color:var(--amenity); }
+.text-employ  { color:var(--employ); }
+.text-safety  { color:var(--safety); }
+
+.bg-amenity { background:rgba(0,191,165,.15); }
+.bg-employ  { background:rgba(68,138,255,.15); }
+.bg-safety  { background:rgba(255,82,82,.15); }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:2px; }
+</style>
+</head>
+<body>
+
+<div class="tricolor"></div>
+<div style="background:#0A1628;border-bottom:1px solid rgba(200,146,42,0.15);padding:7px 16px;display:flex;align-items:center;justify-content:space-between;font-size:11px;">
+  <span style="color:rgba(255,255,255,0.35);">SAMVAD AI &nbsp;·&nbsp; Tata Steel Meramandali</span>
+  <a href="https://sanjanasingh1265.github.io/Samvad-TSL-Portal/dashboard.html" target="_blank" rel="noopener"
+     style="color:rgba(200,146,42,0.65);text-decoration:none;font-weight:600;">📊 HR Dashboard ↗</a>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SCREEN 1 — HOME
+════════════════════════════════════════════════════════ -->
+<div class="screen active" id="screen-home">
+
+  <div class="hero">
+    <div class="logo-ring">🏭</div>
+    <div class="hero-title">SAMVAD</div>
+    <div class="hero-devanagari">संवाद AI &nbsp;·&nbsp; ସଂଭାଦ AI</div>
+    <div class="hero-sub">Grievance Resolution Portal</div>
+    <div class="hero-org">Tata Steel Limited &nbsp;·&nbsp; Meramandali Plant, Odisha</div>
+    <div class="lang-row">
+      <span class="lang-badge active">English</span>
+      <span class="lang-badge">हिन्दी</span>
+      <span class="lang-badge">ଓଡ଼ିଆ</span>
+    </div>
+  </div>
+
+  <div style="width:100%;max-width:520px;margin:0 auto;padding:0 16px;">
+    <div class="notice">
+      <span class="notice-icon">🛡️</span>
+      <span>Select the issue type below. Your concern will be reviewed by the HR team and resolved as quickly as possible.&nbsp; <strong>अपनी समस्या नीचे चुनें</strong></span>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="section-label">Choose Your Concern Category</div>
+
+    <!-- AMENITIES CARD -->
+    <div class="cat-card card-amenity" onclick="openCategory('amenity')">
+      <div class="cat-card-inner">
+        <div class="cat-card-head">
+          <div class="cat-icon">🏗️</div>
+          <div class="cat-info">
+            <div class="cat-name">AMENITIES</div>
+            <div class="cat-name-hi">सुविधाएं &nbsp;·&nbsp; ସୁବିଧା</div>
+            <div class="cat-desc">Workplace Facilities &amp; Welfare Concerns</div>
+          </div>
+        </div>
+        <div class="cat-tags">
+          <span class="cat-tag">🚻 Restroom</span>
+          <span class="cat-tag">💧 Water</span>
+          <span class="cat-tag">🍽️ Canteen</span>
+          <span class="cat-tag">💡 Lighting</span>
+          <span class="cat-tag">🪑 Rest Area</span>
+          <span class="cat-tag">🚌 Transport</span>
+        </div>
+      </div>
+      <div class="cat-footer">
+        <span class="cat-count">9 issue types covered</span>
+        <span class="cat-btn">RAISE CONCERN →</span>
+      </div>
+    </div>
+
+    <!-- EMPLOYMENT CARD -->
+    <div class="cat-card card-employ" onclick="openCategory('employ')">
+      <div class="cat-card-inner">
+        <div class="cat-card-head">
+          <div class="cat-icon">👔</div>
+          <div class="cat-info">
+            <div class="cat-name">EMPLOYMENT</div>
+            <div class="cat-name-hi">रोजगार &nbsp;·&nbsp; ନିୟୋଜନ</div>
+            <div class="cat-desc">HR, Payroll &amp; Service Matters</div>
+          </div>
+        </div>
+        <div class="cat-tags">
+          <span class="cat-tag">👤 Manager Issues</span>
+          <span class="cat-tag">📅 Leave</span>
+          <span class="cat-tag">💰 Salary</span>
+          <span class="cat-tag">🏥 Mediclaim</span>
+          <span class="cat-tag">🔄 Transfer</span>
+          <span class="cat-tag">⏰ Shift</span>
+        </div>
+      </div>
+      <div class="cat-footer">
+        <span class="cat-count">12 issue types covered</span>
+        <span class="cat-btn">RAISE CONCERN →</span>
+      </div>
+    </div>
+
+    <!-- SAFETY CARD -->
+    <div class="cat-card card-safety" onclick="openCategory('safety')">
+      <div class="cat-card-inner">
+        <div class="cat-card-head">
+          <div class="cat-icon">🛡️</div>
+          <div class="cat-info">
+            <div class="cat-name">SAFETY &amp; PROTECTION</div>
+            <div class="cat-name-hi">सुरक्षा &nbsp;·&nbsp; ସୁରକ୍ଷା</div>
+            <div class="cat-desc">Safety, Hazards &amp; Workplace Protection</div>
+          </div>
+        </div>
+        <div class="cat-tags">
+          <span class="cat-tag">⚠️ Unsafe Conditions</span>
+          <span class="cat-tag">🦺 PPE</span>
+          <span class="cat-tag">👩 Women's Safety</span>
+          <span class="cat-tag">🔥 Fire Safety</span>
+          <span class="cat-tag">🚑 Accidents</span>
+        </div>
+      </div>
+      <div class="cat-footer">
+        <span class="cat-count">10 issue types covered</span>
+        <span class="cat-btn">RAISE CONCERN →</span>
+      </div>
+    </div>
+
+    <div class="privacy-box">
+      <div class="privacy-icon">🔒</div>
+      <div class="privacy-text">
+        <strong>100% Anonymous &amp; Confidential</strong><br>
+        पूर्णतः गोपनीय &nbsp;·&nbsp; ସମ୍ପୂର୍ଣ ଗୋପନୀୟ<br>
+        Responses are reviewed only by authorised HR personnel. No retaliation. No personal identification required unless you choose to provide it.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="portal-footer">
+    <div class="footer-text">
+      SAMVAD AI &nbsp;·&nbsp; Tata Steel Limited, Meramandali<br>
+      HR Contact: sanjanasingh1265@gmail.com
+    </div>
+    <div class="footer-badge">SAMVAD v2.0 &nbsp;·&nbsp; May 2025</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SCREEN 2 — AMENITIES FORM
+════════════════════════════════════════════════════════ -->
+<div class="screen amenity" id="screen-amenity">
+  <div class="page-header" style="background:linear-gradient(180deg,#003D35 0%,var(--ink) 100%)">
+    <button class="back-btn" onclick="goHome()">← Back</button>
+    <div class="cat-header">
+      <div class="cat-header-icon bg-amenity">🏗️</div>
+      <div>
+        <div class="cat-header-title text-amenity">AMENITIES</div>
+        <div class="cat-header-sub">Workplace Facility &amp; Welfare Grievances</div>
+      </div>
+    </div>
+    <div class="cat-header-divider text-amenity" style="color:var(--amenity)"></div>
+  </div>
+
+  <div class="form-content">
+    <div class="step-indicator">
+      <div class="step-dot active"></div>
+      <div class="step-dot"></div>
+      <div class="step-dot"></div>
+    </div>
+
+    <!-- REPORTER TYPE -->
+    <div class="reporter-row">
+      <div class="reporter-label">I AM A &nbsp;·&nbsp; मैं हूँ</div>
+      <div class="reporter-opts">
+        <div class="reporter-opt" onclick="selectReporter(this,'amenity')">
+          <span class="ro-emoji">👷</span>Worker
+        </div>
+        <div class="reporter-opt" onclick="selectReporter(this,'amenity')">
+          <span class="ro-emoji">👔</span>Employee
+        </div>
+        <div class="reporter-opt" onclick="selectReporter(this,'amenity')">
+          <span class="ro-emoji">🤝</span>Contractor
+        </div>
+      </div>
+    </div>
+
+    <!-- DIVISION -->
+    <div style="margin-bottom:12px;">
+      <div class="field-label">Your Division / Department</div>
+      <select class="select-field">
+        <option value="">Select your division...</option>
+        <option>Iron Making Operations</option>
+        <option>Steel Making Operations</option>
+        <option>Asset & Energy Management</option>
+        <option>Corporate Services</option>
+        <option>Supply Chain & Logistics</option>
+        <option>Engineering Projects</option>
+        <option>Finance & Business Accounting</option>
+        <option>HRM</option>
+        <option>IT</option>
+      </select>
+    </div>
+
+    <div class="section-label">Select the Issue You Are Facing</div>
+
+    <!-- GRIEVANCE ITEMS AMENITY -->
+    <div id="amenity-items">
+
+      <div class="grievance-item amenity" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">🚻</div>
+          <div class="grievance-info">
+            <div class="grievance-title">Restroom / Washroom Problem</div>
+            <div class="grievance-sub">Cleanliness, hygiene, facility not working</div>
+          </div>
+          <span class="urgency-badge urgency-high">HIGH</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What is the specific problem?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="restroom"><div class="radio-circle"></div><span class="radio-label">Not clean / very dirty and unhygienic</span></label>
+            <label class="radio-opt"><input type="radio" name="restroom"><div class="radio-circle"></div><span class="radio-label">Tap / flush / door not working</span></label>
+            <label class="radio-opt"><input type="radio" name="restroom"><div class="radio-circle"></div><span class="radio-label">No soap / cleaning material available</span></label>
+            <label class="radio-opt"><input type="radio" name="restroom"><div class="radio-circle"></div><span class="radio-label">Restroom is locked / inaccessible</span></label>
+            <label class="radio-opt"><input type="radio" name="restroom"><div class="radio-circle"></div><span class="radio-label">No separate restroom for women</span></label>
+          </div>
+          <div class="detail-question">How long has this problem existed?</div>
+          <div class="scale-row">
+            <div class="scale-btn" onclick="selectScale(this)">Today</div>
+            <div class="scale-btn" onclick="selectScale(this)">2–3 days</div>
+            <div class="scale-btn" onclick="selectScale(this)">1 week</div>
+            <div class="scale-btn" onclick="selectScale(this)">Month+</div>
+          </div>
+          <div class="detail-question">Location / Block (optional)</div>
+          <textarea class="detail-textarea" placeholder="e.g. Block C, Shop Floor 2, near cafeteria..."></textarea>
+        </div>
+      </div>
+
+      <div class="grievance-item amenity" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">💧</div>
+          <div class="grievance-info">
+            <div class="grievance-title">Drinking Water Issue</div>
+            <div class="grievance-sub">Availability, quality, or RO/water cooler problem</div>
+          </div>
+          <span class="urgency-badge urgency-high">HIGH</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What is the problem with drinking water?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="water"><div class="radio-circle"></div><span class="radio-label">No drinking water available on the floor</span></label>
+            <label class="radio-opt"><input type="radio" name="water"><div class="radio-circle"></div><span class="radio-label">RO / water purifier is not working</span></label>
+            <label class="radio-opt"><input type="radio" name="water"><div class="radio-circle"></div><span class="radio-label">Water smells bad or has unusual colour</span></label>
+            <label class="radio-opt"><input type="radio" name="water"><div class="radio-circle"></div><span class="radio-label">Water cooler not maintained / hot water only</span></label>
+            <label class="radio-opt"><input type="radio" name="water"><div class="radio-circle"></div><span class="radio-label">Water point too far from work area</span></label>
+          </div>
+          <div class="detail-question">How long has this been the situation?</div>
+          <div class="scale-row">
+            <div class="scale-btn" onclick="selectScale(this)">Today</div>
+            <div class="scale-btn" onclick="selectScale(this)">2–3 days</div>
+            <div class="scale-btn" onclick="selectScale(this)">1 week</div>
+            <div class="scale-btn" onclick="selectScale(this)">Month+</div>
+          </div>
+          <div class="detail-question">Additional details (optional)</div>
+          <textarea class="detail-textarea" placeholder="Describe the exact location or any other detail..."></textarea>
+        </div>
+      </div>
+
+      <div class="grievance-item amenity" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">🍽️</div>
+          <div class="grievance-info">
+            <div class="grievance-title">Canteen Food Quality / Hygiene</div>
+            <div class="grievance-sub">Food quality, pricing, hygiene, or availability</div>
+          </div>
+          <span class="urgency-badge urgency-med">MED</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What is the canteen complaint?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="canteen"><div class="radio-circle"></div><span class="radio-label">Food is stale, spoiled, or not fresh</span></label>
+            <label class="radio-opt"><input type="radio" name="canteen"><div class="radio-circle"></div><span class="radio-label">Canteen area is unhygienic / dirty</span></label>
+            <label class="radio-opt"><input type="radio" name="canteen"><div class="radio-circle"></div><span class="radio-label">Food quantity is insufficient for the price</span></label>
+            <label class="radio-opt"><input type="radio" name="canteen"><div class="radio-circle"></div><span class="radio-label">No food available during shift timing</span></label>
+            <label class="radio-opt"><input type="radio" name="canteen"><div class="radio-circle"></div><span class="radio-label">No vegetarian / special dietary option available</span></label>
+            <label class="radio-opt"><input type="radio" name="canteen"><div class="radio-circle"></div><span class="radio-label">Staff behaviour is rude or unprofessional</span></label>
+          </div>
+          <div class="detail-question">How would you rate the canteen currently?</div>
+          <div class="scale-row">
+            <div class="scale-btn" onclick="selectScale(this)">😡 Very Bad</div>
+            <div class="scale-btn" onclick="selectScale(this)">😟 Bad</div>
+            <div class="scale-btn" onclick="selectScale(this)">😐 Average</div>
+            <div class="scale-btn" onclick="selectScale(this)">😊 OK</div>
+          </div>
+          <div class="detail-question">Any specific suggestion? (optional)</div>
+          <textarea class="detail-textarea" placeholder="What improvement would help most?"></textarea>
+        </div>
+      </div>
+
+      <div class="grievance-item amenity" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">🪑</div>
+          <div class="grievance-info">
+            <div class="grievance-title">Rest Area / Seating Concern</div>
+            <div class="grievance-sub">No rest space, broken furniture, no shade</div>
+          </div>
+          <span class="urgency-badge urgency-med">MED</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What is the seating / rest area issue?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="seating"><div class="radio-circle"></div><span class="radio-label">No rest area available on the shop floor</span></label>
+            <label class="radio-opt"><input type="radio" name="seating"><div class="radio-circle"></div><span class="radio-label">Chairs / benches are broken or insufficient</span></label>
+            <label class="radio-opt"><input type="radio" name="seating"><div class="radio-circle"></div><span class="radio-label">No shade or cover during breaks</span></label>
+            <label class="radio-opt"><input type="radio" name="seating"><div class="radio-circle"></div><span class="radio-label">Rest area is dirty and poorly maintained</span></label>
+          </div>
+          <div class="detail-question">Additional details (optional)</div>
+          <textarea class="detail-textarea" placeholder="Location, specific concern..."></textarea>
+        </div>
+      </div>
+
+      <div class="grievance-item amenity" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">💡</div>
+          <div class="grievance-info">
+            <div class="grievance-title">Electricity / Fan / Lighting Issue</div>
+            <div class="grievance-sub">No power, poor lighting, broken fans</div>
+          </div>
+          <span class="urgency-badge urgency-med">MED</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What electrical/lighting issue are you facing?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="electric"><div class="radio-circle"></div><span class="radio-label">Fans not working — very hot work area</span></label>
+            <label class="radio-opt"><input type="radio" name="electric"><div class="radio-circle"></div><span class="radio-label">Poor or insufficient lighting in work area</span></label>
+            <label class="radio-opt"><input type="radio" name="electric"><div class="radio-circle"></div><span class="radio-label">Frequent power cuts affecting work</span></label>
+            <label class="radio-opt"><input type="radio" name="electric"><div class="radio-circle"></div><span class="radio-label">Exposed wiring or electrical safety hazard</span></label>
+          </div>
+          <div class="detail-question">Location affected</div>
+          <textarea class="detail-textarea" placeholder="Block name, floor, area..."></textarea>
+        </div>
+      </div>
+
+      <div class="grievance-item amenity" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">🏢</div>
+          <div class="grievance-info">
+            <div class="grievance-title">Infrastructure / General Cleanliness</div>
+            <div class="grievance-sub">Building condition, sanitation, garbage, access</div>
+          </div>
+          <span class="urgency-badge urgency-low">LOW</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What infrastructure concern do you have?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="infra"><div class="radio-circle"></div><span class="radio-label">Work area / corridor not cleaned regularly</span></label>
+            <label class="radio-opt"><input type="radio" name="infra"><div class="radio-circle"></div><span class="radio-label">Garbage bins full / waste not collected</span></label>
+            <label class="radio-opt"><input type="radio" name="infra"><div class="radio-circle"></div><span class="radio-label">Broken walls, flooring, roof leakage</span></label>
+            <label class="radio-opt"><input type="radio" name="infra"><div class="radio-circle"></div><span class="radio-label">Lockers / changing room not maintained</span></label>
+            <label class="radio-opt"><input type="radio" name="infra"><div class="radio-circle"></div><span class="radio-label">Facility inaccessible for differently-abled persons</span></label>
+          </div>
+          <div class="detail-question">Additional details (optional)</div>
+          <textarea class="detail-textarea" placeholder="Describe the issue and location..."></textarea>
+        </div>
+      </div>
+
+      <div class="grievance-item amenity" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">🚌</div>
+          <div class="grievance-info">
+            <div class="grievance-title">Transport / Commuting Issue</div>
+            <div class="grievance-sub">Bus timings, pickup point, condition of transport</div>
+          </div>
+          <span class="urgency-badge urgency-low">LOW</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What is the transport-related problem?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="transport"><div class="radio-circle"></div><span class="radio-label">Bus is often late or does not arrive</span></label>
+            <label class="radio-opt"><input type="radio" name="transport"><div class="radio-circle"></div><span class="radio-label">Bus is overcrowded and unsafe</span></label>
+            <label class="radio-opt"><input type="radio" name="transport"><div class="radio-circle"></div><span class="radio-label">No transport available for my shift time</span></label>
+            <label class="radio-opt"><input type="radio" name="transport"><div class="radio-circle"></div><span class="radio-label">Pickup point is very far from my location</span></label>
+            <label class="radio-opt"><input type="radio" name="transport"><div class="radio-circle"></div><span class="radio-label">Driver behaviour is rude or drives unsafely</span></label>
+          </div>
+          <div class="detail-question">Additional details (optional)</div>
+          <textarea class="detail-textarea" placeholder="Route, timing, location..."></textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ANONYMOUS TOGGLE -->
+    <div class="anon-row">
+      <div>
+        <div class="anon-text">🔒 Submit Anonymously</div>
+        <div class="anon-sub">Your identity will not be shared with anyone</div>
+      </div>
+      <div class="toggle on" id="anon-amenity" onclick="toggleAnon(this)"></div>
+    </div>
+
+    <button class="submit-btn" style="background:var(--amenity);color:#003D35;" onclick="submitForm('amenity')">
+      <span>📤</span> Submit Grievance
+    </button>
+
+    <div style="text-align:center;font-size:11px;color:var(--muted);padding-bottom:24px;">
+      Your concern will be assigned to the HRBP within 24 hours · SLA: 30 days
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SCREEN 3 — EMPLOYMENT FORM
+════════════════════════════════════════════════════════ -->
+<div class="screen employ" id="screen-employ">
+  <div class="page-header" style="background:linear-gradient(180deg,#071C4A 0%,var(--ink) 100%)">
+    <button class="back-btn" onclick="goHome()">← Back</button>
+    <div class="cat-header">
+      <div class="cat-header-icon bg-employ">👔</div>
+      <div>
+        <div class="cat-header-title text-employ">EMPLOYMENT</div>
+        <div class="cat-header-sub">HR, Payroll &amp; Service Matter Grievances</div>
+      </div>
+    </div>
+    <div class="cat-header-divider" style="color:var(--employ)"></div>
+  </div>
+
+  <div class="form-content">
+    <div class="step-indicator">
+      <div class="step-dot active"></div>
+      <div class="step-dot"></div>
+      <div class="step-dot"></div>
+    </div>
+
+    <div class="reporter-row">
+      <div class="reporter-label">I AM A &nbsp;·&nbsp; मैं हूँ</div>
+      <div class="reporter-opts">
+        <div class="reporter-opt" onclick="selectReporter(this,'employ')">
+          <span class="ro-emoji">👷</span>Worker
+        </div>
+        <div class="reporter-opt" onclick="selectReporter(this,'employ')">
+          <span class="ro-emoji">👔</span>Employee
+        </div>
+        <div class="reporter-opt" onclick="selectReporter(this,'employ')">
+          <span class="ro-emoji">🤝</span>Contractor
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px;">
+      <div class="field-label">Your Division / Department</div>
+      <select class="select-field">
+        <option value="">Select your division...</option>
+        <option>Iron Making Operations</option>
+        <option>Steel Making Operations</option>
+        <option>Asset & Energy Management</option>
+        <option>Corporate Services</option>
+        <option>Supply Chain & Logistics</option>
+        <option>Engineering Projects</option>
+        <option>Finance & Business Accounting</option>
+        <option>HRM</option>
+        <option>IT</option>
+      </select>
+    </div>
+
+    <div class="section-label">Select the Issue You Are Facing</div>
+
+    <div id="employ-items">
+
+      <div class="grievance-item employ" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">👤</div>
+          <div class="grievance-info">
+            <div class="grievance-title">Manager / Supervisor Behaviour</div>
+            <div class="grievance-sub">Unfair treatment, verbal abuse, discrimination</div>
+          </div>
+          <span class="urgency-badge urgency-high">HIGH</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What type of behaviour is the concern?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="manager"><div class="radio-circle"></div><span class="radio-label">Verbal abuse or humiliation in front of others</span></label>
+            <label class="radio-opt"><input type="radio" name="manager"><div class="radio-circle"></div><span class="radio-label">Unfair work allocation or favouritism</span></label>
+            <label class="radio-opt"><input type="radio" name="manager"><div class="radio-circle"></div><span class="radio-label">Being given duties beyond my job role</span></label>
+            <label class="radio-opt"><input type="radio" name="manager"><div class="radio-circle"></div><span class="radio-label">Retaliation / victimisation after raising a concern</span></label>
+            <label class="radio-opt"><input type="radio" name="manager"><div class="radio-circle"></div><span class="radio-label">Caste / gender / religion based discrimination</span></label>
+          </div>
+          <div class="detail-question">Has this happened before?</div>
+          <div class="scale-row">
+            <div class="scale-btn" onclick="selectScale(this)">First time</div>
+            <div class="scale-btn" onclick="selectScale(this)">Sometimes</div>
+            <div class="scale-btn" onclick="selectScale(this)">Regularly</div>
+            <div class="scale-btn" onclick="selectScale(this)">Daily</div>
+          </div>
+          <div class="detail-question">Describe what happened (optional)</div>
+          <textarea class="detail-textarea" placeholder="Write as much as you're comfortable sharing. All details are confidential."></textarea>
+        </div>
+      </div>
+
+      <div class="grievance-item employ" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">📅</div>
+          <div class="grievance-info">
+            <div class="grievance-title">Leave Deduction Problem</div>
+            <div class="grievance-sub">Wrong leave deducted, leave not approved, CL/EL issues</div>
+          </div>
+          <span class="urgency-badge urgency-high">HIGH</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What is the leave-related issue?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="leave"><div class="radio-circle"></div><span class="radio-label">Leave wrongly deducted from my balance</span></label>
+            <label class="radio-opt"><input type="radio" name="leave"><div class="radio-circle"></div><span class="radio-label">Approved leave was denied later without reason</span></label>
+            <label class="radio-opt"><input type="radio" name="leave"><div class="radio-circle"></div><span class="radio-label">Leave application was not processed at all</span></label>
+            <label class="radio-opt"><input type="radio" name="leave"><div class="radio-circle"></div><span class="radio-label">Medical / emergency leave was not accepted</span></label>
+            <label class="radio-opt"><input type="radio" name="leave"><div class="radio-circle"></div><span class="radio-label">Balance shown in system is incorrect</span></label>
+          </div>
+          <div class="detail-question">Which type of leave is affected?</div>
+          <div class="scale-row">
+            <div class="scale-btn" onclick="selectScale(this)">CL</div>
+            <div class="scale-btn" onclick="selectScale(this)">EL</div>
+            <div class="scale-btn" onclick="selectScale(this)">Medical</div>
+            <div class="scale-btn" onclick="selectScale(this)">Other</div>
+          </div>
+          <div class="detail-question">Dates involved &amp; additional details</div>
+          <textarea class="detail-textarea" placeholder="Mention the date(s) when leave was deducted or denied..."></textarea>
+        </div>
+      </div>
+
+      <div class="grievance-item employ" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">💰</div>
+          <div class="grievance-info">
+            <div class="grievance-title">Salary / Payroll Discrepancy</div>
+            <div class="grievance-sub">Wrong salary, missing payment, overtime not paid</div>
+          </div>
+          <span class="urgency-badge urgency-high">HIGH</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What is the salary-related issue?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="salary"><div class="radio-circle"></div><span class="radio-label">Salary amount is less than it should be</span></label>
+            <label class="radio-opt"><input type="radio" name="salary"><div class="radio-circle"></div><span class="radio-label">Overtime hours were not paid</span></label>
+            <label class="radio-opt"><input type="radio" name="salary"><div class="radio-circle"></div><span class="radio-label">Salary was delayed this month</span></label>
+            <label class="radio-opt"><input type="radio" name="salary"><div class="radio-circle"></div><span class="radio-label">Wrong deductions from my salary (TDS, PF, etc.)</span></label>
+            <label class="radio-opt"><input type="radio" name="salary"><div class="radio-circle"></div><span class="radio-label">Allowances / incentives not credited</span></label>
+          </div>
+          <div class="detail-question">Approximate amount of difference (optional)</div>
+          <textarea class="detail-textarea" placeholder="e.g. 'Around ₹2,000 less than expected' or 'Overtime of 15 hours not paid'..."></textarea>
+        </div>
+      </div>
+
+      <div class="grievance-item employ" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">🏥</div>
+          <div class="grievance-info">
+            <div class="grievance-title">Mediclaim / Insurance Issue</div>
+            <div class="grievance-sub">Claim not settled, card not received, coverage issue</div>
+          </div>
+          <span class="urgency-badge urgency-high">HIGH</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What is the mediclaim issue?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="mediclaim"><div class="radio-circle"></div><span class="radio-label">Claim submitted but not settled for long time</span></label>
+            <label class="radio-opt"><input type="radio" name="mediclaim"><div class="radio-circle"></div><span class="radio-label">Mediclaim card not received / expired</span></label>
+            <label class="radio-opt"><input type="radio" name="mediclaim"><div class="radio-circle"></div><span class="radio-label">Family member not added to the policy</span></label>
+            <label class="radio-opt"><input type="radio" name="mediclaim"><div class="radio-circle"></div><span class="radio-label">Claim amount was partially or wrongly settled</span></label>
+            <label class="radio-opt"><input type="radio" name="mediclaim"><div class="radio-circle"></div><span class="radio-label">Hospital not in empanelled list — need support</span></label>
+          </div>
+          <div class="detail-question">How long is the claim pending?</div>
+          <div class="scale-row">
+            <div class="scale-btn" onclick="selectScale(this)">< 1 month</div>
+            <div class="scale-btn" onclick="selectScale(this)">1–2 months</div>
+            <div class="scale-btn" onclick="selectScale(this)">3+ months</div>
+          </div>
+          <div class="detail-question">Claim / policy details (optional)</div>
+          <textarea class="detail-textarea" placeholder="Hospital name, claim amount, date of hospitalisation..."></textarea>
+        </div>
+      </div>
+
+      <div class="grievance-item employ" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">📋</div>
+          <div class="grievance-info">
+            <div class="grievance-title">PF / ESI Issue</div>
+            <div class="grievance-sub">PF not deposited, passbook mismatch, ESI concern</div>
+          </div>
+          <span class="urgency-badge urgency-high">HIGH</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What PF or ESI issue are you facing?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="pf"><div class="radio-circle"></div><span class="radio-label">PF not being deducted or deposited</span></label>
+            <label class="radio-opt"><input type="radio" name="pf"><div class="radio-circle"></div><span class="radio-label">PF passbook balance does not match</span></label>
+            <label class="radio-opt"><input type="radio" name="pf"><div class="radio-circle"></div><span class="radio-label">PF withdrawal / transfer not processed</span></label>
+            <label class="radio-opt"><input type="radio" name="pf"><div class="radio-circle"></div><span class="radio-label">ESI card not received or not working</span></label>
+            <label class="radio-opt"><input type="radio" name="pf"><div class="radio-circle"></div><span class="radio-label">Nominee details not updated in records</span></label>
+          </div>
+          <div class="detail-question">Additional details</div>
+          <textarea class="detail-textarea" placeholder="UAN number issue, approximate amount, period..."></textarea>
+        </div>
+      </div>
+
+      <div class="grievance-item employ" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">🔄</div>
+          <div class="grievance-info">
+            <div class="grievance-title">Transfer Request / Issue</div>
+            <div class="grievance-sub">Pending transfer, unwanted transfer, no update given</div>
+          </div>
+          <span class="urgency-badge urgency-med">MED</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What is the transfer issue?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="transfer"><div class="radio-circle"></div><span class="radio-label">Transfer request submitted but no response for months</span></label>
+            <label class="radio-opt"><input type="radio" name="transfer"><div class="radio-circle"></div><span class="radio-label">Transferred without prior notice or reason given</span></label>
+            <label class="radio-opt"><input type="radio" name="transfer"><div class="radio-circle"></div><span class="radio-label">Transfer is being used as punishment</span></label>
+            <label class="radio-opt"><input type="radio" name="transfer"><div class="radio-circle"></div><span class="radio-label">Transfer location is creating hardship for family</span></label>
+          </div>
+          <div class="detail-question">How long has the transfer request been pending?</div>
+          <div class="scale-row">
+            <div class="scale-btn" onclick="selectScale(this)">1 month</div>
+            <div class="scale-btn" onclick="selectScale(this)">3 months</div>
+            <div class="scale-btn" onclick="selectScale(this)">6 months</div>
+            <div class="scale-btn" onclick="selectScale(this)">1 year+</div>
+          </div>
+          <div class="detail-question">Details of the transfer request</div>
+          <textarea class="detail-textarea" placeholder="From / to location, date of request, reference number if any..."></textarea>
+        </div>
+      </div>
+
+      <div class="grievance-item employ" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">📚</div>
+          <div class="grievance-info">
+            <div class="grievance-title">Study Leave / Training Leave</div>
+            <div class="grievance-sub">Leave denied for exam, training, or certification</div>
+          </div>
+          <span class="urgency-badge urgency-med">MED</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What is the issue with study or training leave?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="study"><div class="radio-circle"></div><span class="radio-label">Study leave denied without written reason</span></label>
+            <label class="radio-opt"><input type="radio" name="study"><div class="radio-circle"></div><span class="radio-label">Training nomination cancelled last minute</span></label>
+            <label class="radio-opt"><input type="radio" name="study"><div class="radio-circle"></div><span class="radio-label">Not given opportunity for skill development</span></label>
+            <label class="radio-opt"><input type="radio" name="study"><div class="radio-circle"></div><span class="radio-label">Exam leave application not responded to</span></label>
+          </div>
+          <div class="detail-question">Details about the exam/training</div>
+          <textarea class="detail-textarea" placeholder="Exam name, date, institution name, when leave was requested..."></textarea>
+        </div>
+      </div>
+
+      <div class="grievance-item employ" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">⏰</div>
+          <div class="grievance-info">
+            <div class="grievance-title">Shift Timing / Workload Concern</div>
+            <div class="grievance-sub">Excessive overtime, unfair shifts, overloaded work</div>
+          </div>
+          <span class="urgency-badge urgency-med">MED</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What is the shift or workload concern?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="shift"><div class="radio-circle"></div><span class="radio-label">Being asked to work beyond scheduled hours regularly</span></label>
+            <label class="radio-opt"><input type="radio" name="shift"><div class="radio-circle"></div><span class="radio-label">Shift changed frequently without prior notice</span></label>
+            <label class="radio-opt"><input type="radio" name="shift"><div class="radio-circle"></div><span class="radio-label">Workload is much higher than my role requires</span></label>
+            <label class="radio-opt"><input type="radio" name="shift"><div class="radio-circle"></div><span class="radio-label">Night shifts allocated unfairly to same people always</span></label>
+          </div>
+          <div class="detail-question">Additional details</div>
+          <textarea class="detail-textarea" placeholder="How many hours per day, how long this has been happening..."></textarea>
+        </div>
+      </div>
+
+      <div class="grievance-item employ" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">⬆️</div>
+          <div class="grievance-info">
+            <div class="grievance-title">Promotion / Appraisal Concern</div>
+            <div class="grievance-sub">Unfair rating, promotion not given, no increment</div>
+          </div>
+          <span class="urgency-badge urgency-low">LOW</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What is the promotion or appraisal concern?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="promo"><div class="radio-circle"></div><span class="radio-label">Appraisal rating seems unfair or biased</span></label>
+            <label class="radio-opt"><input type="radio" name="promo"><div class="radio-circle"></div><span class="radio-label">Promised promotion not given despite eligibility</span></label>
+            <label class="radio-opt"><input type="radio" name="promo"><div class="radio-circle"></div><span class="radio-label">Increment not received this year</span></label>
+            <label class="radio-opt"><input type="radio" name="promo"><div class="radio-circle"></div><span class="radio-label">No feedback provided on appraisal outcome</span></label>
+          </div>
+          <div class="detail-question">How many years have you been waiting for promotion?</div>
+          <div class="scale-row">
+            <div class="scale-btn" onclick="selectScale(this)">1 year</div>
+            <div class="scale-btn" onclick="selectScale(this)">2 years</div>
+            <div class="scale-btn" onclick="selectScale(this)">3 years</div>
+            <div class="scale-btn" onclick="selectScale(this)">4+ years</div>
+          </div>
+          <div class="detail-question">Additional context (optional)</div>
+          <textarea class="detail-textarea" placeholder="Grade, role, any previous communication..."></textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="anon-row">
+      <div>
+        <div class="anon-text">🔒 Submit Anonymously</div>
+        <div class="anon-sub">Your identity will not be shared with anyone</div>
+      </div>
+      <div class="toggle on" id="anon-employ" onclick="toggleAnon(this)"></div>
+    </div>
+
+    <button class="submit-btn" style="background:var(--employ);color:#071C4A;" onclick="submitForm('employ')">
+      <span>📤</span> Submit Grievance
+    </button>
+
+    <div style="text-align:center;font-size:11px;color:var(--muted);padding-bottom:24px;">
+      Your concern will be assigned to the HRBP within 24 hours · SLA: 30 days
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SCREEN 4 — SAFETY FORM
+════════════════════════════════════════════════════════ -->
+<div class="screen safety" id="screen-safety">
+  <div class="page-header" style="background:linear-gradient(180deg,#3D0000 0%,var(--ink) 100%)">
+    <button class="back-btn" onclick="goHome()">← Back</button>
+    <div class="cat-header">
+      <div class="cat-header-icon bg-safety">🛡️</div>
+      <div>
+        <div class="cat-header-title text-safety">SAFETY &amp; PROTECTION</div>
+        <div class="cat-header-sub">Workplace Safety, Hazards &amp; Protection Grievances</div>
+      </div>
+    </div>
+    <div class="cat-header-divider" style="color:var(--safety)"></div>
+  </div>
+
+  <div class="form-content">
+    <div class="step-indicator">
+      <div class="step-dot active"></div>
+      <div class="step-dot"></div>
+      <div class="step-dot"></div>
+    </div>
+
+    <!-- URGENT NOTICE -->
+    <div style="background:rgba(255,82,82,.12);border:1px solid rgba(255,82,82,.3);border-radius:var(--rSm);padding:12px 14px;margin-bottom:12px;font-size:12px;color:#FF8A80;">
+      ⚠️ <strong>Urgent safety threats?</strong> Report immediately to your Safety Officer or call the Plant Emergency number. This portal is for formal documentation alongside direct reporting.
+    </div>
+
+    <div class="reporter-row">
+      <div class="reporter-label">I AM A &nbsp;·&nbsp; मैं हूँ</div>
+      <div class="reporter-opts">
+        <div class="reporter-opt" onclick="selectReporter(this,'safety')">
+          <span class="ro-emoji">👷</span>Worker
+        </div>
+        <div class="reporter-opt" onclick="selectReporter(this,'safety')">
+          <span class="ro-emoji">👔</span>Employee
+        </div>
+        <div class="reporter-opt" onclick="selectReporter(this,'safety')">
+          <span class="ro-emoji">🤝</span>Contractor
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px;">
+      <div class="field-label">Your Division / Department</div>
+      <select class="select-field">
+        <option value="">Select your division...</option>
+        <option>Iron Making Operations</option>
+        <option>Steel Making Operations</option>
+        <option>Asset & Energy Management</option>
+        <option>Corporate Services</option>
+        <option>Supply Chain & Logistics</option>
+        <option>Engineering Projects</option>
+        <option>Finance & Business Accounting</option>
+        <option>HRM</option>
+        <option>IT</option>
+      </select>
+    </div>
+
+    <div class="section-label">Select the Safety Issue You Are Reporting</div>
+
+    <div id="safety-items">
+
+      <div class="grievance-item safety" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">⚠️</div>
+          <div class="grievance-info">
+            <div class="grievance-title">Unsafe Working Conditions</div>
+            <div class="grievance-sub">Dangerous environment, hazardous work area</div>
+          </div>
+          <span class="urgency-badge urgency-high">CRITICAL</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What unsafe condition are you reporting?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="unsafe"><div class="radio-circle"></div><span class="radio-label">Slippery floor / fall hazard in work area</span></label>
+            <label class="radio-opt"><input type="radio" name="unsafe"><div class="radio-circle"></div><span class="radio-label">Exposed electrical wires / live equipment</span></label>
+            <label class="radio-opt"><input type="radio" name="unsafe"><div class="radio-circle"></div><span class="radio-label">Falling objects risk from overhead area</span></label>
+            <label class="radio-opt"><input type="radio" name="unsafe"><div class="radio-circle"></div><span class="radio-label">Blocked emergency exit or escape route</span></label>
+            <label class="radio-opt"><input type="radio" name="unsafe"><div class="radio-circle"></div><span class="radio-label">Toxic or hazardous chemicals without labelling</span></label>
+            <label class="radio-opt"><input type="radio" name="unsafe"><div class="radio-circle"></div><span class="radio-label">Excessive heat / extreme temperature in work area</span></label>
+          </div>
+          <div class="detail-question">Is this an immediate risk to life?</div>
+          <div class="scale-row">
+            <div class="scale-btn" onclick="selectScale(this)">Yes — urgent</div>
+            <div class="scale-btn" onclick="selectScale(this)">Serious</div>
+            <div class="scale-btn" onclick="selectScale(this)">Moderate</div>
+            <div class="scale-btn" onclick="selectScale(this)">Low risk</div>
+          </div>
+          <div class="detail-question">Location of the unsafe condition</div>
+          <textarea class="detail-textarea" placeholder="Exact location, block, machine name, area number..."></textarea>
+        </div>
+      </div>
+
+      <div class="grievance-item safety" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">🦺</div>
+          <div class="grievance-info">
+            <div class="grievance-title">PPE / Safety Equipment Not Provided</div>
+            <div class="grievance-sub">Helmet, gloves, goggles, boots, harness not given</div>
+          </div>
+          <span class="urgency-badge urgency-high">CRITICAL</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What PPE or safety equipment is missing?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="ppe"><div class="radio-circle"></div><span class="radio-label">Safety helmet not provided / available</span></label>
+            <label class="radio-opt"><input type="radio" name="ppe"><div class="radio-circle"></div><span class="radio-label">Safety gloves not available or very poor quality</span></label>
+            <label class="radio-opt"><input type="radio" name="ppe"><div class="radio-circle"></div><span class="radio-label">Safety boots / shoes not provided</span></label>
+            <label class="radio-opt"><input type="radio" name="ppe"><div class="radio-circle"></div><span class="radio-label">Safety goggles / face shield missing</span></label>
+            <label class="radio-opt"><input type="radio" name="ppe"><div class="radio-circle"></div><span class="radio-label">Harness / fall protection not provided for height work</span></label>
+            <label class="radio-opt"><input type="radio" name="ppe"><div class="radio-circle"></div><span class="radio-label">Ear protection (earplugs) not available in noisy area</span></label>
+          </div>
+          <div class="detail-question">How long has this PPE been unavailable?</div>
+          <div class="scale-row">
+            <div class="scale-btn" onclick="selectScale(this)">Today</div>
+            <div class="scale-btn" onclick="selectScale(this)">Days</div>
+            <div class="scale-btn" onclick="selectScale(this)">Weeks</div>
+            <div class="scale-btn" onclick="selectScale(this)">Month+</div>
+          </div>
+          <div class="detail-question">Area / department affected</div>
+          <textarea class="detail-textarea" placeholder="Work area, type of work where PPE is needed..."></textarea>
+        </div>
+      </div>
+
+      <div class="grievance-item safety" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">⚙️</div>
+          <div class="grievance-info">
+            <div class="grievance-title">Machine / Equipment Hazard</div>
+            <div class="grievance-sub">Faulty machinery, missing guards, mechanical risk</div>
+          </div>
+          <span class="urgency-badge urgency-high">CRITICAL</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What machine or equipment issue are you reporting?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="machine"><div class="radio-circle"></div><span class="radio-label">Safety guard / cover missing from machine</span></label>
+            <label class="radio-opt"><input type="radio" name="machine"><div class="radio-circle"></div><span class="radio-label">Machine making unusual noise or vibration</span></label>
+            <label class="radio-opt"><input type="radio" name="machine"><div class="radio-circle"></div><span class="radio-label">Emergency stop button not working</span></label>
+            <label class="radio-opt"><input type="radio" name="machine"><div class="radio-circle"></div><span class="radio-label">Crane / forklift / vehicle safety concern</span></label>
+            <label class="radio-opt"><input type="radio" name="machine"><div class="radio-circle"></div><span class="radio-label">Machine was reported earlier but not repaired</span></label>
+          </div>
+          <div class="detail-question">Machine / equipment name and location</div>
+          <textarea class="detail-textarea" placeholder="Machine ID, area, when the fault was first noticed..."></textarea>
+        </div>
+      </div>
+
+      <div class="grievance-item safety" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">🚑</div>
+          <div class="grievance-info">
+            <div class="grievance-title">Accident / Near Miss Reporting</div>
+            <div class="grievance-sub">Something happened — or almost happened — on the job</div>
+          </div>
+          <span class="urgency-badge urgency-high">CRITICAL</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What type of incident occurred?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="accident"><div class="radio-circle"></div><span class="radio-label">Near miss — almost had an accident but avoided it</span></label>
+            <label class="radio-opt"><input type="radio" name="accident"><div class="radio-circle"></div><span class="radio-label">Minor injury occurred (cut, bruise, sprain)</span></label>
+            <label class="radio-opt"><input type="radio" name="accident"><div class="radio-circle"></div><span class="radio-label">Serious injury — required medical attention</span></label>
+            <label class="radio-opt"><input type="radio" name="accident"><div class="radio-circle"></div><span class="radio-label">Property damage due to safety failure</span></label>
+          </div>
+          <div class="detail-question">When did this happen?</div>
+          <div class="scale-row">
+            <div class="scale-btn" onclick="selectScale(this)">Today</div>
+            <div class="scale-btn" onclick="selectScale(this)">Yesterday</div>
+            <div class="scale-btn" onclick="selectScale(this)">This week</div>
+            <div class="scale-btn" onclick="selectScale(this)">Earlier</div>
+          </div>
+          <div class="detail-question">Describe what happened</div>
+          <textarea class="detail-textarea" placeholder="What happened, where, who was involved (optional), was it reported to Safety Officer..."></textarea>
+        </div>
+      </div>
+
+      <div class="grievance-item safety" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">👩</div>
+          <div class="grievance-info">
+            <div class="grievance-title">Women's Safety Concern</div>
+            <div class="grievance-sub">Harassment, unsafe environment for women at workplace</div>
+          </div>
+          <span class="urgency-badge urgency-high">CRITICAL</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What is the concern? (All responses are fully confidential)</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="women"><div class="radio-circle"></div><span class="radio-label">Verbal / sexual harassment by colleague or superior</span></label>
+            <label class="radio-opt"><input type="radio" name="women"><div class="radio-circle"></div><span class="radio-label">Unsafe area — poor lighting / no security in parking or corridor</span></label>
+            <label class="radio-opt"><input type="radio" name="women"><div class="radio-circle"></div><span class="radio-label">No separate restroom / changing room for women</span></label>
+            <label class="radio-opt"><input type="radio" name="women"><div class="radio-circle"></div><span class="radio-label">Threat or intimidation being experienced</span></label>
+            <label class="radio-opt"><input type="radio" name="women"><div class="radio-circle"></div><span class="radio-label">Unwelcome gestures or inappropriate behaviour</span></label>
+          </div>
+          <div class="detail-question">Would you like the HRBP to contact you privately?</div>
+          <div class="scale-row">
+            <div class="scale-btn" onclick="selectScale(this)">Yes please</div>
+            <div class="scale-btn" onclick="selectScale(this)">Stay anonymous</div>
+          </div>
+          <div class="detail-question">Additional details (completely confidential)</div>
+          <textarea class="detail-textarea" placeholder="Share as much or as little as you're comfortable with. You are protected under POSH Act 2013."></textarea>
+        </div>
+      </div>
+
+      <div class="grievance-item safety" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">😤</div>
+          <div class="grievance-info">
+            <div class="grievance-title">Bullying / Intimidation at Workplace</div>
+            <div class="grievance-sub">Mental pressure, threats, hostile work environment</div>
+          </div>
+          <span class="urgency-badge urgency-high">HIGH</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What type of bullying or intimidation are you experiencing?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="bully"><div class="radio-circle"></div><span class="radio-label">Being consistently singled out for criticism or humiliation</span></label>
+            <label class="radio-opt"><input type="radio" name="bully"><div class="radio-circle"></div><span class="radio-label">Physical threats or intimidating gestures</span></label>
+            <label class="radio-opt"><input type="radio" name="bully"><div class="radio-circle"></div><span class="radio-label">Being isolated or excluded by team / supervisors</span></label>
+            <label class="radio-opt"><input type="radio" name="bully"><div class="radio-circle"></div><span class="radio-label">Spreading false rumours about me at workplace</span></label>
+          </div>
+          <div class="detail-question">How frequently does this happen?</div>
+          <div class="scale-row">
+            <div class="scale-btn" onclick="selectScale(this)">Occasionally</div>
+            <div class="scale-btn" onclick="selectScale(this)">Weekly</div>
+            <div class="scale-btn" onclick="selectScale(this)">Daily</div>
+          </div>
+          <div class="detail-question">Describe the situation (optional)</div>
+          <textarea class="detail-textarea" placeholder="Any incident you'd like to share. All information is protected."></textarea>
+        </div>
+      </div>
+
+      <div class="grievance-item safety" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">🔥</div>
+          <div class="grievance-info">
+            <div class="grievance-title">Fire Safety Concern</div>
+            <div class="grievance-sub">Fire extinguisher, fire drill, emergency preparedness</div>
+          </div>
+          <span class="urgency-badge urgency-high">HIGH</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What fire safety concern are you reporting?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="fire"><div class="radio-circle"></div><span class="radio-label">Fire extinguisher is missing, expired, or not working</span></label>
+            <label class="radio-opt"><input type="radio" name="fire"><div class="radio-circle"></div><span class="radio-label">Fire exit blocked / emergency door locked</span></label>
+            <label class="radio-opt"><input type="radio" name="fire"><div class="radio-circle"></div><span class="radio-label">No fire drill conducted in a long time</span></label>
+            <label class="radio-opt"><input type="radio" name="fire"><div class="radio-circle"></div><span class="radio-label">Fire alarm not working / not tested</span></label>
+            <label class="radio-opt"><input type="radio" name="fire"><div class="radio-circle"></div><span class="radio-label">Flammable materials stored unsafely</span></label>
+          </div>
+          <div class="detail-question">Location of fire safety concern</div>
+          <textarea class="detail-textarea" placeholder="Block, floor, area name..."></textarea>
+        </div>
+      </div>
+
+      <div class="grievance-item safety" onclick="toggleItem(this)">
+        <div class="grievance-head">
+          <div class="grievance-emoji">🧠</div>
+          <div class="grievance-info">
+            <div class="grievance-title">Mental Health / Psychological Safety</div>
+            <div class="grievance-sub">Work-related stress, anxiety, mental well-being concern</div>
+          </div>
+          <span class="urgency-badge urgency-high">HIGH</span>
+          <div class="select-circle"></div>
+        </div>
+        <div class="grievance-detail">
+          <div class="detail-question">What psychological safety concern do you want to raise?</div>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="mental"><div class="radio-circle"></div><span class="radio-label">Extreme work stress due to unrealistic targets</span></label>
+            <label class="radio-opt"><input type="radio" name="mental"><div class="radio-circle"></div><span class="radio-label">Fear of speaking up or raising concerns at work</span></label>
+            <label class="radio-opt"><input type="radio" name="mental"><div class="radio-circle"></div><span class="radio-label">Anxiety or depression related to workplace situation</span></label>
+            <label class="radio-opt"><input type="radio" name="mental"><div class="radio-circle"></div><span class="radio-label">Request for access to Employee Assistance Programme (EAP)</span></label>
+          </div>
+          <div class="detail-question">Would you like HR to arrange counselling support?</div>
+          <div class="scale-row">
+            <div class="scale-btn" onclick="selectScale(this)">Yes please</div>
+            <div class="scale-btn" onclick="selectScale(this)">Not now</div>
+            <div class="scale-btn" onclick="selectScale(this)">Just documenting</div>
+          </div>
+          <div class="detail-question">Additional details (optional, fully confidential)</div>
+          <textarea class="detail-textarea" placeholder="You don't have to share anything you don't want to. Just raising the concern is enough."></textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="anon-row">
+      <div>
+        <div class="anon-text">🔒 Submit Anonymously</div>
+        <div class="anon-sub">Your identity will not be shared with anyone</div>
+      </div>
+      <div class="toggle on" id="anon-safety" onclick="toggleAnon(this)"></div>
+    </div>
+
+    <button class="submit-btn" style="background:var(--safety);color:#3D0000;" onclick="submitForm('safety')">
+      <span>📤</span> Submit Safety Concern
+    </button>
+
+    <div style="text-align:center;font-size:11px;color:var(--muted);padding-bottom:24px;">
+      Critical safety concerns are escalated immediately · SLA: 24–48 hours
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SCREEN 5 — SUCCESS
+════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-success">
+  <div class="content" style="display:flex;flex-direction:column;justify-content:center;min-height:100dvh;padding:24px;">
+    <div class="success-card">
+      <div class="success-ring">✅</div>
+      <div class="success-title">Grievance Submitted</div>
+      <div class="success-sub">
+        Your concern has been recorded and will be reviewed by the authorised HRBP. No personal identification has been shared without your consent.
+        <br><br>
+        <em style="color:rgba(200,146,42,.7);">आपकी शिकायत दर्ज हो गई है।</em>
+      </div>
+
+      <div class="case-id" id="case-id-display">CASE #SAMVAD-0000</div>
+
+      <div class="what-next">
+        <div class="what-next-title">What Happens Next</div>
+        <div class="next-item">
+          <div class="next-dot"></div>
+          <div class="next-text">Your HRBP will review this grievance within <strong>24 hours</strong> of submission</div>
+        </div>
+        <div class="next-item">
+          <div class="next-dot"></div>
+          <div class="next-text">A resolution plan will be initiated within <strong>72 hours</strong></div>
+        </div>
+        <div class="next-item">
+          <div class="next-dot"></div>
+          <div class="next-text">Target closure: within <strong>30 days</strong> per HR SLA policy</div>
+        </div>
+        <div class="next-item">
+          <div class="next-dot"></div>
+          <div class="next-text">If unresolved, your concern escalates automatically to the HR Head</div>
+        </div>
+      </div>
+
+      <div style="background:var(--goldDim);border:1px solid rgba(200,146,42,.2);border-radius:var(--rSm);padding:12px 14px;margin-bottom:20px;font-size:12px;color:rgba(200,146,42,.8);line-height:1.6;">
+        📞 For urgent matters: Contact HR at <strong>sanjanasingh1265@gmail.com</strong>
+      </div>
+
+      <button class="home-btn" onclick="goHome()">Submit Another Concern</button>
+      <div style="margin-top:10px;text-align:center;">
+        <a href="https://sanjanasingh1265.github.io/Samvad-TSL-Portal/dashboard.html"
+           target="_blank" rel="noopener"
+           style="font-size:12px;color:rgba(200,146,42,0.6);text-decoration:underline;">
+          📊 View HR Dashboard — updates automatically ↗
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── NAVIGATION ─────────────────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) { el.classList.add('active'); window.scrollTo(0,0); }
+}
+
+function openCategory(cat) { showScreen('screen-' + cat); }
+function goHome() { showScreen('screen-home'); }
+
+// ── TOGGLE GRIEVANCE ITEM ──────────────────────────────────────────────────
+function toggleItem(el) {
+  const parent = el.closest('.grievance-item').parentElement;
+  const wasSelected = el.classList.contains('selected');
+  // Close all others in this category
+  parent.querySelectorAll('.grievance-item.selected').forEach(item => {
+    item.classList.remove('selected');
+  });
+  if (!wasSelected) el.classList.add('selected');
+  // Scroll into view smoothly
+  if (!wasSelected) setTimeout(() => el.scrollIntoView({ behavior:'smooth', block:'nearest' }), 80);
+}
+
+// ── SELECT SCALE BUTTON ────────────────────────────────────────────────────
+function selectScale(btn) {
+  const row = btn.parentElement;
+  row.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── REPORTER TYPE ──────────────────────────────────────────────────────────
+function selectReporter(el, cat) {
+  const parent = el.parentElement;
+  parent.querySelectorAll('.reporter-opt').forEach(o => o.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── ANON TOGGLE ────────────────────────────────────────────────────────────
+function toggleAnon(el) { el.classList.toggle('on'); }
+
+// ── CATEGORY MAPPING ────────────────────────────────────────────────────────
+const CAT_MAP = {
+  amenity: 'Amenities',
+  employ:  'Employment Issues',
+  safety:  'Safety & Well-Being',
+};
+
+// ── HRBP AUTO-ASSIGN ─────────────────────────────────────────────────────────
+const PORTAL_HRBP_MAP = {
+  'Iron Making Operations':         'Priya Sharma',
+  'Steel Making Operations':        'Rajesh Kumar',
+  'Asset & Energy Management':      'Anita Nair',
+  'Corporate Services':             'Suresh Patel',
+  'Supply Chain & Logistics':       'Meena Joshi',
+  'Engineering Projects':           'Arjun Das',
+  'Finance & Business Accounting':  'Meena Joshi',
+  'HRM':                            'Suresh Patel',
+  'IT':                             'Anita Nair',
+};
+
+// ── PRIORITY AUTO-ASSIGN ──────────────────────────────────────────────────────
+function autoPriority(cat, sub) {
+  const s = (sub||'').toLowerCase();
+  const high = ['women','harassment','accident','fire','ppe','machine','electrical','hazard','salary','payroll','mediclaim','leave deduction'];
+  if (high.some(k => s.includes(k)) || cat === 'Safety & Well-Being') return 'High';
+  const med = ['transfer','canteen','water','restroom','shift','overtime','pf','study','bully'];
+  if (med.some(k => s.includes(k)) || cat === 'Employment Issues') return 'Medium';
+  return 'Low';
+}
+
+// ── BROADCAST CHANNEL (cross-tab real-time) ──────────────────────────────────
+let _portalBC = null;
+try { _portalBC = new BroadcastChannel('samvad_sync'); } catch(e) {}
+
+// ── COLLECT FORM DATA ────────────────────────────────────────────────────────
+function collectFormData(cat) {
+  const screen   = document.getElementById('screen-' + cat);
+  const deptEl   = screen.querySelector('.select-field');
+  const dept     = deptEl ? deptEl.value : '';
+  const repEl    = screen.querySelector('.reporter-opt.active');
+  const reporter = repEl ? repEl.textContent.trim() : 'Unknown';
+  const anonEl   = document.getElementById('anon-' + cat);
+  const anon     = anonEl ? anonEl.classList.contains('on') : true;
+  const selected = screen.querySelector('.grievance-item.selected');
+  const subTitle = selected ? ((selected.querySelector('.grievance-title')||{}).textContent||'General') : 'General';
+  const textarea = selected ? ((selected.querySelector('.detail-textarea')||{}).value||'') : '';
+  const radioEl  = selected ? selected.querySelector('input[type=radio]:checked') : null;
+  const radioLabel = radioEl ? ((radioEl.closest('.radio-opt').querySelector('.radio-label')||{}).textContent||'') : '';
+  const descParts = [radioLabel.trim(), textarea.trim()].filter(Boolean);
+  const desc = descParts.join(' — ') || '(No additional details provided)';
+  const category = CAT_MAP[cat] || 'Amenities';
+  const hrbp     = PORTAL_HRBP_MAP[dept] || 'To Be Assigned';
+  const priority = autoPriority(category, subTitle);
+  const now      = new Date();
+  const dateStr  = now.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}).replace(/ /g,'-');
+
+  return {
+    category, dept, reporter, anonymous: anon,
+    subCategory: subTitle.trim(),
+    description: desc,
+    hrbp, priority,
+    date: dateStr,
+    status: 'Open',
+    tat: 0,
+    remark: 'New case — awaiting HRBP review.',
+    timestamp: now.toISOString(),
+    source: 'portal',
+  };
+}
+
+// ── SUBMIT FORM ────────────────────────────────────────────────────────────
+function submitForm(cat) {
+  const data = collectFormData(cat);
+
+  // Generate case ID from existing count
+  let existingCases = [];
+  try { existingCases = JSON.parse(localStorage.getItem('samvad_db') || '[]'); } catch(e) {}
+  const nextNum = String(existingCases.length + 1).padStart(3,'0');
+  const caseId  = 'GRV-' + nextNum;
+  data.id = caseId;
+
+  // Write to localStorage (dashboard reads this)
+  const allCases = [...existingCases, data];
+  try { localStorage.setItem('samvad_db', JSON.stringify(allCases)); } catch(e) {}
+
+  // Fire BroadcastChannel so dashboard updates instantly across tabs
+  try { if(_portalBC) _portalBC.postMessage({ type:'NEW_SUBMISSION', payload:data }); } catch(e) {}
+
+  // postMessage to opener (if dashboard opened portal)
+  try {
+    if (window.opener && !window.opener.closed)
+      window.opener.postMessage({ type:'SAMVAD_SUBMISSION', payload:data }, '*');
+    if (window.parent !== window)
+      window.parent.postMessage({ type:'SAMVAD_SUBMISSION', payload:data }, '*');
+  } catch(e) {}
+
+  document.getElementById('case-id-display').textContent = 'CASE #' + caseId;
+  showScreen('screen-success');
+}
+
+// ── RADIO LABEL CLICK FIX ──────────────────────────────────────────────────
+document.addEventListener('click', function(e) {
+  const opt = e.target.closest('.radio-opt');
+  if (!opt) return;
+  const radio = opt.querySelector('input[type=radio]');
+  if (radio) {
+    // Deselect all in group
+    const name = radio.name;
+    document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+      r.checked = false;
+      r.closest('.radio-opt').style.background = '';
+      r.closest('.radio-opt').style.borderColor = '';
+    });
+    radio.checked = true;
+    // Highlight selected
+    const accentVar = opt.closest('[class*="amenity"]') ? 'var(--amenity)' :
+                      opt.closest('[class*="employ"]')  ? 'var(--employ)' :
+                      opt.closest('[class*="safety"]')  ? 'var(--safety)' : 'var(--gold)';
+    opt.style.background = 'rgba(255,255,255,0.08)';
+    opt.style.borderColor = accentVar;
+  }
+});
+
+// ── LOAD FROM URL HASH ─────────────────────────────────────────────────────
+(function() {
+  const hash = window.location.hash.replace('#','');
+  if (['amenity','employ','safety'].includes(hash)) openCategory(hash);
+})();
+</script>
+</body>
+</html>
